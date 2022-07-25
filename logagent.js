@@ -1,5 +1,5 @@
 const { Client } = require("@elastic/elasticsearch")
-const client = new Client({ node: "http://elastichost:9200" })
+const client = new Client({ node: "http://elasticsearch:9200" })
 const { Tail } = require("tail")
 const tail = new Tail("/var/log/app/log-file.log")
 tail.on("line", async body => {
