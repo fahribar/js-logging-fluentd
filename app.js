@@ -1,16 +1,34 @@
+const winston = require("winston")
+const logger = new winston.createLogger({
+format: winston.format.json(),
+transports: [
+new winston.transports.Console(),
+
+]
+})
+
 const tickInterval = 4000
 const tockInterval = 4000
 const tockDelay = 2000
 let tickIntervalHandle
 let tockTimeoutHandle
 let tockIntervalHandle
-const logEvent = (eventName, functionName, message) =>
-console.log(JSON.stringify({
-timestamp: new Date(),
-eventName,
-functionName,
-message
-}))
+// const logEvent = (eventName, functionName, message) =>
+// console.log(JSON.stringify({
+// timestamp: new Date(),
+// eventName,
+// functionName,
+// message
+// }))
+const logEvent = (eventName, functionName, message) => {
+  const logMessage = {
+  timestamp: new Date(),
+  eventName,
+  functionName,
+  message
+  }
+  logger.info(eventName, logMessage)
+  }
 const tick = () => logEvent("TICK", "tick()", "Tick...")
 const tock = () => logEvent("TOCK", "tock()", "Tock!")
 function startClock() {
@@ -26,6 +44,7 @@ startClock()
   // so that we can log the end of the application and gracefully
   // clean up all scheduled function calls
 
+  
 var process = require("process")
 process.on("SIGINT", () => {
 logEvent("APPSTOP", null, "Application stopped!")

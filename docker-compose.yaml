@@ -1,4 +1,4 @@
-version: '3'
+version: '3.0'
 services:
   elastichost:
     image: elasticsearch:7.8.0
@@ -6,8 +6,43 @@ services:
       - "9200:9200"
       - "9300:9300"
     environment:
-      - discovery.tipe=single-node
+      - discovery.type=single-node
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+    networks:
+      - stack
   kibana:
+    platform: linux/amd64
     image: kibana:7.8.0
     ports:
       - "5601:5601"
+    environment:
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=$ELASTIC_PASSWORD
+      - ELASTICSEARCH.SSL.VERIFIVATIONMODE=none
+    networks:
+      - stack
+    volumes:
+      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+  app:
+    build: ./
+    links:
+      - "fluentd"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: fluentd:24224
+  fluentd:
+    build: ./
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links:
+      - "elastichost"
+networks:
+  stack:
+ #docker build -t node-logger-app . 
+#docker run --name logger-app --network js-logging-fluentd_stack --rm node-logger-app
